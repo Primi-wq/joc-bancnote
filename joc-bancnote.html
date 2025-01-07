@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joc de Compunere a Numerelor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .game-container {
+            max-width: 600px;
+            margin: auto;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .target {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone {
+            height: 200px;
+            border: 2px dashed #aaa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .money-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .money {
+            width: 70px;
+            height: 40px;
+            background-color: #f1c40f;
+            border: 1px solid #d4ac0d;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+        }
+
+        .money.dragging {
+            opacity: 0.5;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="target">Compune suma: <span id="target-sum">50</span> lei</div>
+        <div class="drop-zone" id="dropZone">
+            Trage aici monedele și bancnotele
+        </div>
+        <div id="feedback" class="feedback"></div>
+
+        <div class="money-container">
+            <div class="money" draggable="true" data-value="1">1 leu</div>
+            <div class="money" draggable="true" data-value="5">5 lei</div>
+            <div class="money" draggable="true" data-value="10">10 lei</div>
+            <div class="money" draggable="true" data-value="50">50 lei</div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const feedback = document.getElementById('feedback');
+        const targetSum = document.getElementById('target-sum');
+
+        let target = 50; // Suma de compus
+        let currentSum = 0;
+
+        const moneyElements = document.querySelectorAll('.money');
+
+        moneyElements.forEach(money => {
+            money.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', money.dataset.value);
+                money.classList.add('dragging');
+            });
+
+            money.addEventListener('dragend', () => {
+                money.classList.remove('dragging');
+            });
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = '#e8f8e8';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.backgroundColor = '#fff';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = '#fff';
+
+            const value = parseInt(e.dataTransfer.getData('text/plain'));
+            currentSum += value;
+
+            if (currentSum === target) {
+                feedback.textContent = 'Bravo! Ai compus suma corectă!';
+                feedback.className = 'success';
+            } else if (currentSum > target) {
+                feedback.textContent = 'Ai depășit suma. Încearcă din nou!';
+                feedback.className = 'error';
+                currentSum = 0; // Resetează suma
+            } else {
+                feedback.textContent = `Suma curentă: ${currentSum} lei.`;
+                feedback.className = '';
+            }
+        });
+    </script>
+</body>
+</html>
